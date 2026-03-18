@@ -6,40 +6,30 @@ from decimal import Decimal
 from categories.models import Category
 
 
-class Transaction(models.Model):
-
-    class TransactionType(models.TextChoices):
-        INCOME = 'INCOME', 'Income'
-        EXPENSE = 'EXPENSE', 'Expense'
-
+class Budget(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='transactions'
+        related_name='budgets'
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='transactions'
+        on_delete=models.CASCADE,
+        related_name='budgets'
     )
-    amount = models.DecimalField(
+    amount_limit = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))]
     )
-    date = models.DateField()
-    description = models.TextField(blank=True, default='')
-    type = models.CharField(
-        max_length=7,
-        choices=TransactionType.choices,
-    )
+    month = models.PositiveSmallIntegerField()
+    year = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-date', '-created_at']
+        unique_together = ('user', 'category', 'month', 'year')
+        ordering = ['-year', '-month']
 
     def __str__(self):
-        return f"{self.type} | {self.amount} | {self.date} | {self.user.username}"
+        return f"Budget: {self.category.name} | {self.month}/{self.year} | Limit: {self.amount_limit}"
