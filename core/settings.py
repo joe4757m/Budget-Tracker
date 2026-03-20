@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'budgets',
     'dashboard',
     'rest_framework_simplejwt.token_blacklist',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
